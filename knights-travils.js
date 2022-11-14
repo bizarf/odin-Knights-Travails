@@ -33,22 +33,24 @@ const makeLegalMoves = (position) => {
 }
 
 function knightMoves(start, goal, route = []) {
+    if (start[0] < 0 || start[0] > 7 || start[1] < 0 || start[1] > 7) {
+        return "err"
+    }
     let legalMove = makeLegalMoves(start)
 
-    if (board[goal[0]][goal[1]] === 1) {
-        return true
-    } else {
-        legalMove.forEach(move => {
+    if (board[goal[0]][goal[1]] === 1) return route
+    legalMove.forEach(move => {
+        if (board[move[0]][move[1]] === 0) {
             board[move[0]][move[1]] = 1
             route.push(move)
             knightMoves(move, goal, route)
-        })
-        console.log(board)
-    }
+        }
+    })
+    // console.log(board)    }
     return route
 }
 
 // console.log(board())
-// console.log(makeLegalMoves([0, 0]))
+// console.log(makeLegalMoves([7, 0]))
 let board = makeBoard()
-console.log(knightMoves([0, 0], [2, 4]))
+console.log(knightMoves([7, 7], [7, 4]))
