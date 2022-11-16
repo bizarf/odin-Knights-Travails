@@ -1,121 +1,39 @@
 class Node {
-    // store the current position, and the next position. Can be used for adjacency list?
-    constructor() {
-        this.position = []
-        this.next = []
-        this.adjacencyList = new Map()
+    // store the current position, and the route.
+    constructor(position, route) {
+        this.position = position
+        this.route = route
+    }
+}
+
+function knightMoves(start, goal) {
+    if (start[0] < 0 || start[0] > 7 || start[1] < 0 || start[1] > 7) {
+        return "Error. Please select numbers between 0 and 7"
     }
 
-    knightMoves(start, goal, route = [], queue = [start]) {
-        if (start[0] < 0 || start[0] > 7 || start[1] < 0 || start[1] > 7) {
-            return "err"
-        }
-        let board = makeBoard()
-        // board[start[0]][start[1]] = 1
-        // // console.log(board[goal[0]][goal[1]])
-        // // route.push(start)
+    let board = makeBoard()
+    let queue = [new Node(start, [start])]
 
-        // let legalMove = makeLegalMoves(start)
+    while (queue.length > 0) {
+        // marks the opening move with a 1 on the board
+        board[start[0]][start[1]] = 1
+        let currentMove = queue.shift()
 
-        // if (board[goal[0]][goal[1]] === 1) return
-        // if (start[0] === goal[0] && start[1] === goal[1]) return
-        // legalMove.forEach(move => {
-        //     if (board[goal[0]][goal[1]] === 1) {
-        //         return
-        //     } else if (board[move[0]][move[1]] === 0) {
-        //         knightMoves(move, goal, route, queue)
-        //     }
-        // })
+        // generate legal moves
+        const legalMove = makeLegalMoves(currentMove.position)
 
-        while (queue.length > 0) {
-            board[start[0]][start[1]] = 1
-            let currentMove = queue.shift()
-            // route.push(currentMove)
-            if (currentMove[0] === goal[0] && currentMove[1] === goal[1]) {
-                // route.push(currentMove)
-                break
-            };
-
-            const legalMove = makeLegalMoves(currentMove)
-            legalMove.forEach(move => {
-                if (board[goal[0]][goal[1]] === 1) return
-                board[move[0]][move[1]] = 1
-                // this.position.push(`${currentMove}`)
-                // this.next.push(
-                //     [`${currentMove}`, `${move}`]
-                // )
-                this.position.push(currentMove)
-                this.next.push([currentMove, move])
-                // this.position.push(`[${currentMove[0]}, ${currentMove[1]}]`)
-                // this.next.push([`[${currentMove[0]}, ${currentMove[1]}]`, `[${move[0]}, ${move[1]}]`])
-                queue.push(move)
-            })
-        }
-        // console.log(this)
-        // return route
-        this.makeAdjacencyList(this.position, this.next, start, goal)
-    }
-
-    makeAdjacencyList(key, list, start, goal) {
-        key.forEach(item => this.adjacencyList.set(item, []))
-        list.forEach(paths => this.addEdge(...paths))
-        // list.forEach(paths => console.log(...paths))
-        console.log(this.adjacencyList)
-        // this.bfs(start, goal)
-        // this.dfs(start, goal)
-        // console.log(this)
-    }
-
-    mapSet() {
-
-    }
-
-    addEdge(origin, destination) {
-        console.log(origin)
-        console.log(destination)
-        this.adjacencyList.get(origin).push(destination);
-        // this.adjacencyList.get(destination).push(origin);
-    }
-
-    bfs(start, goal) {
-        const visited = new Set()
-        const queue = [start]
-
-        while (queue.length > 0) {
-            const key = queue.shift();
-            const paths = this.adjacencyList.get(key)
-
-            for (const path of paths) {
-
-                // if (path === goal) {
-                //     console.log("yes")
-                // }
-
-                if (!visited.has(path)) {
-                    visited.add(path);
-                    // queue.push(path)
-                    // queue.push(1)
-                }
+        // loop to go through each move
+        for (const move of legalMove) {
+            if (board[goal[0]][goal[1]] === 1) {
+                console.log(`This will require ${queue[queue.length -1].route.length} moves to reach the goal. Here is the list of moves to the goal:`)
+                queue[queue.length - 1].route.forEach(item => console.log(item))
+                // stops undefined from appearing
+                return ""
             }
-        }
-    }
-
-    dfs(start, goal, visited = new Set()) {
-        console.log(start)
-
-        visited.add(start)
-
-        const moves = this.adjacencyList.get(start)
-
-        for (const move of moves) {
-            if (move === goal) {
-                console.log("GG")
-                return
-            }
-
-            if (!visited.has(move)) {
-                this.dfs(move, goal, visited)
-            }
+            board[move[0]][move[1]] = 1
+            // makes a new node containing the current move and the route it took to get there
+            let node = new Node(move, currentMove.route.concat([move]))
+            queue.push(node)
         }
     }
 }
@@ -132,7 +50,7 @@ const makeBoard = () => {
     return board
 }
 
-// makes converts provided position into moves that are within the board
+// converts provided position into moves that are within the board
 const makeLegalMoves = (position) => {
     const possibleMoves = [
         [1, 2],
@@ -145,6 +63,7 @@ const makeLegalMoves = (position) => {
         [-1, 2]
     ]
 
+    // calculate the new position and then filter moves that fall off the board
     let moves = possibleMoves.map(move => {
         let x = position[0] + move[0]
         let y = position[1] + move[1]
@@ -156,14 +75,6 @@ const makeLegalMoves = (position) => {
     return moves
 }
 
-// console.log(board())
-// console.log(makeLegalMoves([7, 0]))
-let node = new Node()
-// let board = node.makeBoard()
-// console.log(board)
-// console.log(node.knightMoves([0, 0], [1, 2]))
-console.log(node.knightMoves([0, 0], [3, 3]))
-// console.log(node.knightMoves([3, 3], [0, 0]))
 // console.log(knightMoves([0, 0], [1, 2]))
 // console.log(knightMoves([0, 0], [3, 3]))
-// console.log(knightMoves([3, 3], [0, 0]))
+console.log(knightMoves([3, 3], [0, 0]))
